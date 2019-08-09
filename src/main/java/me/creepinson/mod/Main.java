@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 import me.creepinson.mod.config.ConfigHandler;
 import me.creepinson.mod.entity.ModEntities;
 import me.creepinson.mod.gui.GuiHandler;
+import me.creepinson.mod.packet.EntityDetectorSyncHandler;
+import me.creepinson.mod.packet.PacketEntityDetectorSync;
 import me.creepinson.mod.packet.PacketUpdateEntityDetectorRange;
 import me.creepinson.mod.packet.PacketUpdateEntityWhitelist;
 import me.creepinson.mod.packet.UpdateEntityDetectorRangeHandler;
@@ -59,8 +61,8 @@ public class Main {
 		if (!(event.getEntity() instanceof EntityPlayer)) {
 			if (EntityList.getKey(event.getEntity()) != null) {
 				ResourceLocation eloc = EntityList.getKey(event.getEntity());
-				if (ConfigHandler.hasKey("spawn_control", eloc.toString())) {
-					if (!ConfigHandler.getBoolean("spawn_control", eloc.toString())) {
+				if (ConfigHandler.mobSpawningControl.containsKey(eloc.toString())) {
+					if (!ConfigHandler.mobSpawningControl.get(eloc.toString())) {
 						event.setCanceled(true);
 					}
 				}
@@ -72,9 +74,9 @@ public class Main {
 	public void init(FMLInitializationEvent event) {
 
 		// Config
-		if (!ConfigHandler.hasKey("spawn_control", "minecraft:pig")) {
-			ConfigHandler.writeConfig("spawn_control", "minecraft:pig", true);
-		}
+
+		// --
+
 		GameRegistry.registerTileEntity(TileEntityEntityDetector.class,
 				new ResourceLocation(Reference.MODID, "tile_entity_detector"));
 
@@ -84,8 +86,13 @@ public class Main {
 		PACKET_INSTANCE.registerMessage(UpdateEntityDetectorRangeHandler.class, PacketUpdateEntityDetectorRange.class,
 				1, Side.SERVER);
 
+		PACKET_INSTANCE.registerMessage(EntityDetectorSyncHandler.class, PacketEntityDetectorSync.class,
+				2, Side.CLIENT);
+		PACKET_INSTANCE.registerMessage(EntityDetectorSyncHandler.class, PacketEntityDetectorSync.class,
+				3, Side.SERVER);
+
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
-		//
+		// --
 	}
 
 	@EventHandler

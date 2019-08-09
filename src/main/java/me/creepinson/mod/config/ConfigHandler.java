@@ -1,328 +1,39 @@
 package me.creepinson.mod.config;
 
-import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import me.creepinson.mod.util.Reference;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Config(modid = Reference.MODID, name = Reference.NAME)
 public class ConfigHandler {
-	public static Configuration config;
-	private static String file = "config/" + Reference.MODID + ".cfg";
+	@Config.Comment({ "Here you can add a mob spawning rule to disable mob spawning",
+			"using the format 'minecraft:pig', ", "being the identifier for the mob you want to use. ", "Just add a comma on the end of the line before the line you are adding. ", "Then copy and paste the line below the previous one, and change 'minecraft:pig' to the RESOURCELOCATION/identifier of your mob. ", "Just make sure that the last line in the mob spawning control section does not have a comma!" })
+	public static final Map<String, Boolean> mobSpawningControl = new HashMap<>();
 
-	public static void init() {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	/*
-	 * Removes specific category from configuration file.
-	 */
-	public static void removeConfig(String category) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.hasCategory(category))
-				config.removeCategory(new ConfigCategory(category));
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	/*
-	 * Removes specific key in specific category from configuration file.
-	 */
-	public static void removeConfig(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key))
-				config.getCategory(category).remove(key);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static int getInt(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return config.get(category, key, 0).getInt();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return 0;
-	}
-
-	public static double getDouble(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return config.get(category, key, 0D).getDouble();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return 0D;
-	}
-
-	public static float getFloat(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return (float) config.get(category, key, 0D).getDouble();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return 0f;
-	}
-
-	public static String getString(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return config.get(category, key, "").getString();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return "";
-	}
-
-	public static long getLong(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return config.get(category, key, 0L).getLong();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return 0L;
-	}
-
-	public static short getShort(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return (short) config.get(category, key, (short) 0).getInt();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return (short) 0;
-	}
-
-	public static byte getByte(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key)) {
-				return (byte) config.get(category, key, (byte) 0).getInt();
-			}
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return (byte) 0;
-	}
-
-	public static boolean getBoolean(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (config.getCategory(category).containsKey(key))
-				return config.get(category, key, false).getBoolean();
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return false;
-	}
-
-	public static void writeConfig(String category, String key, String value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			String set = config.get(category, key, value).getString();
-			config.getCategory(category).get(key).set(value);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
+	static {
+		mobSpawningControl.put("minecraft:pig", true);
 	}
 	
-	public static void writeConfig(String category, String key, String[] value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			String[] set = config.get(category, key, value).getStringList();
-			config.getCategory(category).get(key).set(value);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
+	@Mod.EventBusSubscriber(modid = Reference.MODID)
+	private static class EventHandler {
+
+		/**
+		 * Inject the new values and save to the config file when the config has been
+		 * changed from the GUI.
+		 *
+		 * @param event The event
+		 */
+		@SubscribeEvent
+		public static void onConfigChanged(final ConfigChangedEvent.OnConfigChangedEvent event) {
+			if (event.getModID().equals(Reference.MODID)) {
+				ConfigManager.sync(Reference.MODID, Config.Type.INSTANCE);
+			}
 		}
-	}
-
-	public static void writeConfig(String category, String key, int value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			int set = config.get(category, key, value).getInt();
-			config.getCategory(category).get(key).set(value);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static void writeConfig(String category, String key, boolean value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			boolean set = config.get(category, key, value).getBoolean();
-			config.getCategory(category).get(key).set(value);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static void writeConfig(String category, String key, long value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			long set = config.get(category, key, value).getLong();
-			config.getCategory(category).get(key).set(value);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static void writeConfig(String category, String key, double value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			double set = config.get(category, key, value).getDouble();
-			config.getCategory(category).get(key).set(value);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static void writeConfig(String category, String key, short value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			int set = config.get(category, key, value).getInt();
-			config.getCategory(category).get(key).set(Integer.valueOf(value));
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static void writeConfig(String category, String key, byte value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			int set = config.get(category, key, value).getInt();
-			config.getCategory(category).get(key).set(Integer.valueOf(value));
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static void writeConfig(String category, String key, float value) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			double set = config.get(category, key, value).getDouble();
-			config.getCategory(category).get(key).set(Double.valueOf(value));
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-	}
-
-	public static boolean hasCategory(String category) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			return config.hasCategory(category);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return false;
-	}
-
-	public static boolean hasKey(String category, String key) {
-		config = new Configuration(new File(file));
-		try {
-			config.load();
-			if (!config.hasCategory(category))
-				return false;
-			return config.getCategory(category).containsKey(key);
-		} catch (Exception e) {
-			System.out.println("Cannot load configuration file!");
-		} finally {
-			config.save();
-		}
-		return false;
-	}
-
-	public static void setFile(String filename) {
-		file = "config/" + filename;
-	}
-
-	public static String getFile() {
-		return file;
 	}
 }

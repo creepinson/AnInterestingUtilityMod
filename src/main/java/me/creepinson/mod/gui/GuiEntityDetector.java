@@ -10,6 +10,7 @@ import java.util.HashSet;
 import org.lwjgl.opengl.GL11;
 
 import me.creepinson.mod.Main;
+import me.creepinson.mod.packet.PacketEntityDetectorSync;
 import me.creepinson.mod.packet.PacketUpdateEntityDetectorRange;
 import me.creepinson.mod.packet.PacketUpdateEntityWhitelist;
 import me.creepinson.mod.tile.TileEntityEntityDetector;
@@ -24,9 +25,9 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiEntityDetector extends GuiScreen {
 
-	private TileEntityEntityDetector tile;
+	public TileEntityEntityDetector tile;
 
-	private GuiSlider rangeSlider;
+	public GuiSlider rangeSlider;
 
 	private GuiEntityTypeList typeList;
 
@@ -55,8 +56,8 @@ public class GuiEntityDetector extends GuiScreen {
 			@Override
 			public void setEntryValue(int id, float value) {
 				tile.radiusRange = (int) value;
-				mc.player.world.setTileEntity(tile.getPos(), tile);
-				PacketUpdateEntityDetectorRange packet = new PacketUpdateEntityDetectorRange((int) value, tile.getPos());
+				//PacketUpdateEntityDetectorRange packet = new PacketUpdateEntityDetectorRange((int) value, tile.getPos());
+				PacketEntityDetectorSync packet = new PacketEntityDetectorSync((int) value, tile.entityWhiteList, tile.getPos());
 				Main.PACKET_INSTANCE.sendToServer(packet);
 			}
 
@@ -64,7 +65,7 @@ public class GuiEntityDetector extends GuiScreen {
 			public void setEntryValue(int id, boolean value) {
 
 			}
-		}, 0, 150, 5, "Detection Range", 1, this.tile.maxRadiusRange, this.tile.radiusRange,
+		}, 0, 10, 5, "Detection Range", 1, this.tile.maxRadiusRange, this.tile.radiusRange,
 				new GuiSlider.FormatHelper() {
 
 					@Override
@@ -73,7 +74,7 @@ public class GuiEntityDetector extends GuiScreen {
 					}
 				});
 
-		typeList = new GuiEntityTypeList(310, 0);
+		typeList = new GuiEntityTypeList(this, 160, 0);
 		if (this.tile.entityWhiteList.size() > 0) {
 			for (Class<? extends Entity> ce : this.tile.entityWhiteList) {
 				if (ce == EntityPlayer.class) {
@@ -108,8 +109,8 @@ public class GuiEntityDetector extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 
 		this.drawDefaultBackground();
-		int iy = 15;
-		this.fontRenderer.drawString("Entities Detected: ", 20, 5, 0xffffff);
+		int iy = 45;
+		this.fontRenderer.drawString("Entities Detected: ", 10, iy - 10, 0xffffff);
 		for (Entity e : this.tile.detectedEntities) {
 			GL11.glPushMatrix();
 			GL11.glScaled(0.85, 0.85, 0.85);
@@ -137,8 +138,8 @@ public class GuiEntityDetector extends GuiScreen {
 					}
 				}
 			}
-			mc.world.setTileEntity(this.tile.getPos(), this.tile);
-			PacketUpdateEntityWhitelist packet = new PacketUpdateEntityWhitelist(this.tile.entityWhiteList, this.tile.getPos());
+			//PacketUpdateEntityWhitelist packet = new PacketUpdateEntityWhitelist(this.tile.entityWhiteList, this.tile.getPos());
+			PacketEntityDetectorSync packet = new PacketEntityDetectorSync((int) rangeSlider.getSliderValue(), tile.entityWhiteList, tile.getPos());
 			Main.PACKET_INSTANCE.sendToServer(packet);
 		}
 		rangeSlider.drawButton(mc, mouseX, mouseY, partialTicks);

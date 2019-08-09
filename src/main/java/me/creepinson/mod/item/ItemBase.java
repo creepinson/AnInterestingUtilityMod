@@ -3,6 +3,7 @@ package me.creepinson.mod.item;
 import me.creepinson.mod.Main;
 import me.creepinson.mod.ModItems;
 import me.creepinson.mod.util.ClientProxy;
+import me.creepinson.mod.util.Reference;
 import me.creepinson.mod.util.interfaces.IHasModel;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -10,17 +11,17 @@ import net.minecraft.item.Item;
 
 public class ItemBase extends Item implements IHasModel {
 	
-	public ItemBase(String name, Material mat) {
-		this(name, mat, CreativeTabs.BUILDING_BLOCKS);
+	public ItemBase(String name) {
+		this(name, CreativeTabs.BUILDING_BLOCKS);
 		
-		
-		ModItems.ITEMS.add(this);
 	}
 
-	public ItemBase(String name, Material mat, CreativeTabs tab) {
+	public ItemBase(String name, CreativeTabs tab) {
 		setUnlocalizedName(name);
-		setRegistryName(name);
+		setRegistryName(Reference.MODID, name);
 		setCreativeTab(tab);
+		
+		ModItems.ITEMS.add(this);
 	}
 
 	@Override

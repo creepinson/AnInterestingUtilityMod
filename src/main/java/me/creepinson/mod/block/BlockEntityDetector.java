@@ -79,7 +79,6 @@ public class BlockEntityDetector extends BlockBase implements ITileEntityProvide
 	@Override
 	public int getStrongPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 		if (state.getValue(EMIT)) {
-			System.out.println("TEST");
 			return 15;
 		} else {
 			return 0;

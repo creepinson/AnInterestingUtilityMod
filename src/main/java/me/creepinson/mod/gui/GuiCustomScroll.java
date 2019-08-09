@@ -8,13 +8,17 @@ import java.util.List;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.input.Mouse;
 
+import me.creepinson.mod.Main;
 import me.creepinson.mod.gui.util.ICustomScrollListener;
+import me.creepinson.mod.packet.PacketEntityDetectorSync;
+import me.creepinson.mod.tile.TileEntityEntityDetector;
 import me.creepinson.mod.util.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
 
 public class GuiCustomScroll extends GuiScreen {
 	public static final ResourceLocation resource = new ResourceLocation(Reference.MODID, "textures/gui/misc.png");
@@ -37,11 +41,12 @@ public class GuiCustomScroll extends GuiScreen {
 	private boolean isSorted = true;
 	public boolean visible = true;
 	private boolean selectable = true;
+	private GuiEntityDetector detectorGUI;
 
-	public GuiCustomScroll(GuiScreen parent, int id) {
-		width = 176;
+	public GuiCustomScroll(GuiScreen parent, int id, GuiEntityDetector detectorGUI) {
+		width = 275;
 		height = 166;
-		xSize = 176;
+		xSize = 275;
 		ySize = 159;
 		selected = -1;
 		hover = -1;
@@ -54,11 +59,12 @@ public class GuiCustomScroll extends GuiScreen {
 			listener = (ICustomScrollListener) parent;
 		this.list = new ArrayList<String>();
 		this.id = id;
-		this.setWorldAndResolution(Minecraft.getMinecraft(), 176, 166);
+		this.detectorGUI = detectorGUI;
+		this.setWorldAndResolution(Minecraft.getMinecraft(), width, height);
 	}
 
-	public GuiCustomScroll(GuiScreen parent, int id, boolean multipleSelection) {
-		this(parent, id);
+	public GuiCustomScroll(GuiScreen parent, int id, GuiEntityDetector tile, boolean multipleSelection) {
+		this(parent, id, tile);
 		this.multipleSelection = multipleSelection;
 	}
 
@@ -119,7 +125,7 @@ public class GuiCustomScroll extends GuiScreen {
 			}
 
 			if (mouseScrolled != 0) {
-				scrollY += mouseScrolled > 0 ? -14 : 14;
+				scrollY += mouseScrolled > 0 ? -3 : 3;
 				if (scrollY > maxScrollY)
 					scrollY = maxScrollY;
 				if (scrollY < 0)
@@ -140,7 +146,7 @@ public class GuiCustomScroll extends GuiScreen {
 			int k = (14 * i + 4) - scrollY;
 			if (k >= 4 && k + 12 < ySize) {
 				int xOffset = scrollHeight < ySize - 8 ? 0 : 10;
-				String displayString = WordUtils.capitalize(list.get(i).replace("minecraft:", "").replace("_", " "));
+				String displayString = list.get(i);
 				String text = "";
 				float maxWidth = (xSize + xOffset - 8) * 0.8f;
 				if (fontRenderer.getStringWidth(displayString) > maxWidth) {
@@ -198,6 +204,13 @@ public class GuiCustomScroll extends GuiScreen {
 		if (multipleSelection) {
 			if (selectedList.contains(list.get(hover))) {
 				selectedList.remove(list.get(hover));
+				if(list.get(hover) == "Player") {
+					detectorGUI.tile.entityWhiteList.remove(EntityPlayer.class);
+				} else {
+					detectorGUI.tile.entityWhiteList.remove(EntityList.getClass(new ResourceLocation(list.get(hover))));
+				}
+				PacketEntityDetectorSync packet = new PacketEntityDetectorSync((int)detectorGUI.rangeSlider.getSliderValue(), detectorGUI.tile.entityWhiteList, detectorGUI.tile.getPos());
+				Main.PACKET_INSTANCE.sendToServer(packet);
 			} else {
 				selectedList.add(list.get(hover));
 			}

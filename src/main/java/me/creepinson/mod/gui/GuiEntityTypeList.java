@@ -18,6 +18,7 @@ import org.lwjgl.input.Mouse;
 import com.google.common.collect.Lists;
 
 import me.creepinson.mod.gui.util.ICustomScrollListener;
+import me.creepinson.mod.tile.TileEntityEntityDetector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -39,18 +40,20 @@ public class GuiEntityTypeList extends GuiScreen implements ICustomScrollListene
 
 	private int x;
 	private int y;
+	private GuiEntityDetector tile;
 
-	public GuiEntityTypeList(int x, int y, List<Class<? extends Entity>> selected) {
-		this(x, y);
+	public GuiEntityTypeList(GuiEntityDetector tile, int x, int y, List<Class<? extends Entity>> selected) {
+		this(tile, x, y);
 		// this.selected = selected;
 
 	}
 
-	public GuiEntityTypeList(int x, int y) {
+	public GuiEntityTypeList(GuiEntityDetector tile, int x, int y) {
 		this.width = 175;
 		this.height = 310;
 		this.x = x;
 		this.y = y;
+		this.tile = tile;
 		this.selected = new ArrayList<String>();
 		Set<ResourceLocation> mapping = EntityList.getEntityNameList();
 		for (ResourceLocation name : mapping) {
@@ -69,18 +72,18 @@ public class GuiEntityTypeList extends GuiScreen implements ICustomScrollListene
 		list = new ArrayList<String>(data.keySet());
 		list.add("Player");
 		Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
-		this.setWorldAndResolution(Minecraft.getMinecraft(), 175, height);
+		this.setWorldAndResolution(Minecraft.getMinecraft(), width, height);
 		
 	}
 
 	@Override
 	public void initGui() {
 		super.initGui();
-		scroll = new GuiCustomScroll(this, 0, true);
+		scroll = new GuiCustomScroll(this, 0, this.tile, true);
 		scroll.setUnsortedList(list);
 		scroll.guiLeft = x;
 		scroll.guiTop = y;
-		scroll.setSize(100, height - 70);
+		scroll.setSize(this.width - 25, height - 70);
 
 	}
 
