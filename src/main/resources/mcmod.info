@@ -1,0 +1,16 @@
+[
+{
+  "modid": "aniumod",
+  "name": "An Interesting Utility Mod",
+  "description": "testing.",
+  "version": "1.0.0",
+  "mcversion": "1.12.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Creepinson"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
