@@ -5,8 +5,10 @@
 package me.creepinson.mod.tile;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 
@@ -16,6 +18,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -26,7 +29,7 @@ public class TileEntityEntityDetector extends TileEntity implements ITickable {
 	public boolean entityFound;
 	public List<Entity> detectedEntities = new ArrayList<Entity>();
 	public int radiusRange = 1;
-	public List<Class<? extends Entity>> entityWhiteList = new ArrayList<Class<? extends Entity>>();
+	public Set<Class<? extends Entity>> entityWhiteList = new HashSet<Class<? extends Entity>>();
 	public int maxRadiusRange = 20; // implement range upgrade item for more range.
 
 	public static List<Entity> getEntitiesInAABB(World world, List<Class<? extends Entity>> whitelist,
@@ -63,13 +66,18 @@ public class TileEntityEntityDetector extends TileEntity implements ITickable {
 	}
 
 	@Override
+	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+		return oldState.getBlock() != newState.getBlock();
+	}
+	
+	@Override
 	public void update() {
 
 		if (!entityWhiteList.isEmpty()) {
-			this.detectedEntities = getEntitiesInAABB(world, entityWhiteList,
+			this.detectedEntities = world.getEntitiesWithinAABB(Entity.class,
 					new AxisAlignedBB(pos.subtract(new Vec3i(radiusRange + 1, radiusRange + 1, radiusRange + 1)),
 							pos.add(new Vec3i(radiusRange + 1, radiusRange + 1, radiusRange + 1))));
-
+			this.filterEntities();
 		}
 		this.entityFound = this.detectedEntities.size() > 0;
 		IBlockState state = world.getBlockState(pos);
@@ -79,6 +87,12 @@ public class TileEntityEntityDetector extends TileEntity implements ITickable {
 			world.setBlockState(pos, state.withProperty(BlockEntityDetector.EMIT, false));
 		}
 
+	}
+
+	private void filterEntities() {
+		Iterator<Entity> i = this.detectedEntities.iterator();
+		Entity ie = i.next();
+		if (!entityWhiteList.contains(ie.getClass())) i.remove();
 	}
 
 	public TileEntityEntityDetector() {

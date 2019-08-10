@@ -77,22 +77,26 @@ public class BlockEntityDetector extends BlockBase implements ITileEntityProvide
 	}
 
 	@Override
-	public int getStrongPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-		if (state.getValue(EMIT)) {
-			return 15;
-		} else {
-			return 0;
+	public int getStrongPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+		if (world.getTileEntity(pos) instanceof TileEntityEntityDetector) {
+			TileEntityEntityDetector tile = (TileEntityEntityDetector) world.getTileEntity(pos);
+			System.out.println("test");
+			if (tile.entityFound) {
+				return 15;
+			}
 		}
+		return 0;
 	}
 
 	@Override
-	public int getWeakPower(IBlockState state, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-
-		if (state.getValue(EMIT)) {
-			return 15;
-		} else {
-			return 0;
+	public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+		if (world.getTileEntity(pos) instanceof TileEntityEntityDetector) {
+			TileEntityEntityDetector tile = (TileEntityEntityDetector) world.getTileEntity(pos);
+			if (tile.entityFound) {
+				return 15;
+			}
 		}
+		return 0;
 	}
 
 	@Override
