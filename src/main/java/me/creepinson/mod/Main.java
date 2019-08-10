@@ -7,10 +7,6 @@ import me.creepinson.mod.entity.ModEntities;
 import me.creepinson.mod.gui.GuiHandler;
 import me.creepinson.mod.packet.EntityDetectorSyncHandler;
 import me.creepinson.mod.packet.PacketEntityDetectorSync;
-import me.creepinson.mod.packet.PacketUpdateEntityDetectorRange;
-import me.creepinson.mod.packet.PacketUpdateEntityWhitelist;
-import me.creepinson.mod.packet.UpdateEntityDetectorRangeHandler;
-import me.creepinson.mod.packet.UpdateEntityWhitelistHandler;
 import me.creepinson.mod.tile.TileEntityEntityDetector;
 import me.creepinson.mod.util.CommonProxy;
 import me.creepinson.mod.util.Reference;
@@ -81,15 +77,11 @@ public class Main {
 				new ResourceLocation(Reference.MODID, "tile_entity_detector"));
 
 		// Packets & Guis
-		PACKET_INSTANCE.registerMessage(UpdateEntityWhitelistHandler.class, PacketUpdateEntityWhitelist.class, 0,
-				Side.SERVER);
-		PACKET_INSTANCE.registerMessage(UpdateEntityDetectorRangeHandler.class, PacketUpdateEntityDetectorRange.class,
+		
+		PACKET_INSTANCE.registerMessage(EntityDetectorSyncHandler.class, PacketEntityDetectorSync.class,
+				0, Side.CLIENT);
+		PACKET_INSTANCE.registerMessage(EntityDetectorSyncHandler.class, PacketEntityDetectorSync.class,
 				1, Side.SERVER);
-
-		PACKET_INSTANCE.registerMessage(EntityDetectorSyncHandler.class, PacketEntityDetectorSync.class,
-				2, Side.CLIENT);
-		PACKET_INSTANCE.registerMessage(EntityDetectorSyncHandler.class, PacketEntityDetectorSync.class,
-				3, Side.SERVER);
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 		// --

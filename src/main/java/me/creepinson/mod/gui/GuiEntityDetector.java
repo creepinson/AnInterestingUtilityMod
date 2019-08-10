@@ -7,15 +7,11 @@ package me.creepinson.mod.gui;
 import java.io.IOException;
 import java.util.HashSet;
 
-import org.lwjgl.opengl.GL11;
-
 import me.creepinson.mod.Main;
 import me.creepinson.mod.packet.PacketEntityDetectorSync;
-import me.creepinson.mod.packet.PacketUpdateEntityDetectorRange;
-import me.creepinson.mod.packet.PacketUpdateEntityWhitelist;
 import me.creepinson.mod.tile.TileEntityEntityDetector;
-import net.minecraft.client.gui.GuiPageButtonList.GuiResponder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiPageButtonList.GuiResponder;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlider;
 import net.minecraft.entity.Entity;
@@ -56,7 +52,6 @@ public class GuiEntityDetector extends GuiScreen {
 			@Override
 			public void setEntryValue(int id, float value) {
 				tile.radiusRange = (int) value;
-				//PacketUpdateEntityDetectorRange packet = new PacketUpdateEntityDetectorRange((int) value, tile.getPos());
 				PacketEntityDetectorSync packet = new PacketEntityDetectorSync((int) value, tile.entityWhiteList, tile.getPos());
 				Main.PACKET_INSTANCE.sendToServer(packet);
 			}
@@ -110,21 +105,6 @@ public class GuiEntityDetector extends GuiScreen {
 
 		this.drawDefaultBackground();
 		int iy = 45;
-		this.fontRenderer.drawString("Entities Detected: ", 10, iy - 10, 0xffffff);
-		for (Entity e : this.tile.detectedEntities) {
-			GL11.glPushMatrix();
-			GL11.glScaled(0.85, 0.85, 0.85);
-			if (e instanceof EntityPlayer) {
-				if (e.getUniqueID().equals(mc.player.getUniqueID())) {
-					this.fontRenderer.drawString(e.getDisplayName().getUnformattedText(), 20, iy += 10, 0x34eb5f);
-				} else {
-					this.fontRenderer.drawString(e.getDisplayName().getUnformattedText(), 20, iy += 10, 0x9934eb);
-				}
-			} else {
-				this.fontRenderer.drawString(e.getDisplayName().getUnformattedText(), 20, iy += 10, 0xeb4034);
-			}
-			GL11.glPopMatrix();
-		}
 		if (typeList.scroll.getSelectedList() != null && typeList.scroll.getSelectedList().size() > 0) {
 			for (String s : typeList.scroll.getSelectedList()) {
 				if (s == "Player") {
@@ -138,7 +118,6 @@ public class GuiEntityDetector extends GuiScreen {
 					}
 				}
 			}
-			//PacketUpdateEntityWhitelist packet = new PacketUpdateEntityWhitelist(this.tile.entityWhiteList, this.tile.getPos());
 			PacketEntityDetectorSync packet = new PacketEntityDetectorSync((int) rangeSlider.getSliderValue(), tile.entityWhiteList, tile.getPos());
 			Main.PACKET_INSTANCE.sendToServer(packet);
 		}
